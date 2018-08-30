@@ -1,7 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Dapper_SimpleExtensions
 {
+    public class PageData<TEnity>
+    {
+        public int PageNumber { get; set; }
+        public int RowsPerPage { get; set; }
+        public long Total { get; set; }
+        public IEnumerable<TEnity> PageList { get; set; }
+
+        public PageData()
+        {
+
+        }
+
+        public PageData(IEnumerable<TEnity> pageList, long total) : this(pageList, total, 0, 0)
+        {
+
+        }
+
+        public PageData(IEnumerable<TEnity> pageList, long total, int pageNumber, int rowPerpage)
+        {
+            Total = total;
+            PageList = pageList;
+            PageNumber = pageNumber;
+            RowsPerPage = rowPerpage;
+
+        }
+    }
+
     /// <summary>
     /// Optional Table attribute.
     /// You can use the System.ComponentModel.DataAnnotations version in its place to specify the table name of a poco

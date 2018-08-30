@@ -1,4 +1,5 @@
 ﻿using Dapper_SimpleExtensions;
+using System.Data;
 using static Dapper_SimpleExtensions.Enums;
 
 namespace Dapper_SimpleExtensions_Test
@@ -11,6 +12,11 @@ namespace Dapper_SimpleExtensions_Test
 
         }
 
+
+        public  IDbConnection conn()
+        {
+            return GetConnection();
+        }
         public static DbConetxt Get()
         {
             return new DbConetxt(sqlconn, Dialect.SQLServer);
@@ -23,5 +29,8 @@ namespace Dapper_SimpleExtensions_Test
                 return new DbSet<Student>(GetConnection(), Dialect.SQLServer);
             }
         }
+
+
+
     }
 }

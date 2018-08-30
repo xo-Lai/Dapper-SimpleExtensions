@@ -5,10 +5,11 @@ using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using static Dapper_SimpleExtensions.Enums;
+using System.Threading.Tasks;
 
 namespace Dapper_SimpleExtensions
 {
-    public class DbQuery<TResult> : IQuery<TResult> where TResult : class
+    public partial class DbQuery<TResult> : IQuery<TResult> where TResult : class
     {
         public DbQuery(IDbConnection connection, Dialect dialect)
         {
@@ -60,23 +61,14 @@ namespace Dapper_SimpleExtensions
             }
         }
 
-        /// <summary>
-        /// Used before GetList or GetPaged  Or GetFirst
-        /// </summary>
-        /// <param name="exp"></param>
-        /// <returns></returns>
+
         public IQuery<TResult> Where(Expression<Func<TResult, bool>> exp)
         {
             _whereExp = exp;
             return this;
         }
 
-        /// <summary>
-        /// order by aes 
-        /// Used before GetList or GetPaged  Or GetFirst
-        /// </summary>
-        /// <param name="exp"></param>
-        /// <returns></returns>
+
         public IQuery<TResult> OrderBy(Expression<Func<TResult, object>> exp)
         {
             _orderbyExp = exp;
@@ -85,12 +77,7 @@ namespace Dapper_SimpleExtensions
             return this;
         }
 
-        /// <summary>
-        /// order by desc
-        /// Used before GetList or GetPaged  Or GetFirst
-        /// </summary>
-        /// <param name="exp"></param>
-        /// <returns></returns>
+
         public IQuery<TResult> OrderByDesc(Expression<Func<TResult, object>> exp)
         {
             _orderbyExp = exp;
@@ -118,13 +105,13 @@ namespace Dapper_SimpleExtensions
         }
 
 
-        public IEnumerable<TResult> GetListPaged(int pageIndex, int pageSize)
+        public PageData<TResult> GetListPaged(int pageNumber, int rowPerpage)
         {
 
             if (string.IsNullOrEmpty(_getPagedListSql))
                 throw new Exception("GetListPage is not supported with the current SQL Dialect");
 
-            if (pageIndex < 1)
+            if (pageNumber < 1)
                 throw new Exception("Page must be greater than 0");
             var currenttype = typeof(TResult);
             var idProps = SqlManipulationExtensions.GetIdProperties(currenttype).ToList();
@@ -137,11 +124,11 @@ namespace Dapper_SimpleExtensions
             query = query.BuildTableName(tableName)
                 .BuildColumns(SqlManipulationExtensions.BuildSelect<TResult>())
                 .BuildWhere(whereAndargs.Item1)
-                .BuildPage(pageIndex, pageSize)
+                .BuildPage(pageNumber, rowPerpage)
                 .BuildOrderBy(SqlManipulationExtensions.BuildOrderBy(_orderbyExp, _orderbyAseOrDesc));
-
-            return _connection.Query<TResult>(query, whereAndargs.Item2, DapperDbContext.GetInnerTransaction());
-
+            var total = RecordCount();
+            var list = _connection.Query<TResult>(query, whereAndargs.Item2, DapperDbContext.GetInnerTransaction());
+            return new PageData<TResult>(list, total,pageNumber, rowPerpage);
         }
 
         public TResult GetFisrt()
@@ -193,5 +180,7 @@ namespace Dapper_SimpleExtensions
                 .BuildOrderBy(SqlManipulationExtensions.BuildOrderBy(_orderbyExp, _orderbyAseOrDesc));
             return _connection.QueryFirstOrDefault<TResult>(query, whereAndargs.Item2, DapperDbContext.GetInnerTransaction());
         }
+
+
     }
 }

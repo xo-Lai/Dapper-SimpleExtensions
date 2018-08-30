@@ -67,6 +67,7 @@
     <Compile Include="Common.cs" />
     <Compile Include="DapperDbContext.cs" />
     <Compile Include="DbQuery.cs" />
+    <Compile Include="DbQueryAsync.cs" />
     <Compile Include="DbSet.cs" />
     <Compile Include="EntityAttributes.cs" />
     <Compile Include="ExpressionExtend\ConditionBuilder.cs" />

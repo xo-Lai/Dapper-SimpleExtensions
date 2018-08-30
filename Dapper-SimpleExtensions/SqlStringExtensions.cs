@@ -12,9 +12,9 @@
             return sql.Replace("{SelectColumns}", columns);
         }
 
-        public static string BuildPage(this string sql, int pageIndex, int pageSize)
+        public static string BuildPage(this string sql, int pageNumber, int rowsPerPage)
         {
-            return sql.Replace("{PageNumber}", pageIndex.ToString()).Replace("{RowsPerPage}", pageSize.ToString()).Replace("{Offset}", ((pageIndex - 1) * pageSize).ToString());
+            return sql.Replace("{PageNumber}", pageNumber.ToString()).Replace("{RowsPerPage}", rowsPerPage.ToString()).Replace("{Offset}", ((pageNumber - 1) * rowsPerPage).ToString());
         }
 
         public static string BuildOrderBy(this string sql, string orderby)
